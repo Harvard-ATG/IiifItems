@@ -169,7 +169,18 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         catch (Exception $e) {
         }
         // If missing or failed, build from file data
-        list($fileWidth, $fileHeight) = getimagesize(FILES_DIR . DIRECTORY_SEPARATOR . $file->getStoragePath());
+        // Commented code relies on file being in files dir, which is not the case if using a storage adapter
+        // Implemented solution uses
+        // list($fileWidth, $fileHeight) = getimagesize(FILES_DIR . DIRECTORY_SEPARATOR . $file->getStoragePath());
+        $fileMetadata = json_decode($file->metadata);
+        if($fileMetadata === NULL || !isset($fileMetadata->video)) {
+            _log("Cannot get image size metadata for file {$file->id}", Zend_Log::WARN);
+            $fileWidth = 0;
+            $fileHeight = 0;
+        } else {
+            $fileWidth = $fileMetadata->video->resolution_x;
+            $fileHeight = $fileMetadata->video->resolution_y;
+        }
         $fileJson = array(
             '@id' => public_full_url(array(
                 'things' => 'files',
