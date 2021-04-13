@@ -76,7 +76,7 @@ class IiifItems_IiifUtil {
         if (!isset($jsonData['metadata'])) {
             $jsonData['metadata'] = array(
                 array(
-                    'label' => 'Original Item',
+                    'label' => __('Record in Omeka'),
                     'value' => '<a href="' . record_url($record) . '">View Omeka page</a>'
                 )
             );
