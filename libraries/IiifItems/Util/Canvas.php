@@ -58,8 +58,8 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         if (self::_containsNonIiifFile($itemFiles)) {
             $representativeType = self::_getNonIiifType($itemFiles);
             $representativeUrlBase = str_replace(
-                array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'), 
-                array('iiifitems_' . $representativeType, 'jpg', 'iiifitems_' . $representativeType . '.jpg'), 
+                array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'),
+                array('iiifitems_' . $representativeType, 'jpg', 'iiifitems_' . $representativeType . '.jpg'),
                 get_option('iiifitems_bridge_prefix')
             );
             $iiifJsonData['images'][] = array(
@@ -110,7 +110,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         }
         // Plug DC metadata
         if ($applyDublin) {
-            parent::addDublinCoreMetadata($iiifJsonData, $item);
+            parent::addMetadata($iiifJsonData, $item);
         }
         // Plug otherContent for annotation lists
         if (is_admin_theme()) {
@@ -128,7 +128,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         // Done
         return $iiifJsonData;
     }
-    
+
     /**
      * Return the IIIF Presentation API canvas representation of a single annotation on its attached item
      * @param Item $annotation Annotation-typed item
@@ -148,7 +148,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         ));
         return $base;
     }
-    
+
     /**
      * Return the IIIF Presentation API image representation of a file
      * @param File $file
@@ -205,7 +205,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         );
         return $fileJson;
     }
-    
+
     /**
      * Return the IIIF prefix for the given local File record.
      * @param File $file
@@ -214,8 +214,8 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
     public static function fileIiifPrefix($file) {
         $bridgePrefix = get_option('iiifitems_bridge_prefix');
         $replacedBridgePrefix = str_replace(
-            array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'), 
-            array(basename($file->filename), $file->DERIVATIVE_EXT, $file->filename), 
+            array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'),
+            array(basename($file->filename), $file->DERIVATIVE_EXT, $file->filename),
             $bridgePrefix
         );
         return $replacedBridgePrefix;
@@ -244,11 +244,11 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         $json = self::blankTemplate($canvasId, $fileImageJson['resource']['width'], $fileImageJson['resource']['height'], $displayTitle, array($fileImageJson));
         // Apply Dublin Core metadata
         if ($applyDublin) {
-            parent::addDublinCoreMetadata($json, $file);
+            parent::addMetadata($json, $file);
         }
         return $json;
     }
-    
+
     /**
      * Return whether this item is not presentable in IIIF
      * @param Item $item
@@ -257,7 +257,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
     public static function isNonIiifItem($item) {
         return ($item->item_type_id != get_option('iiifitems_annotation_item_type') && self::_containsNonIiifFile($item->getFiles())) || raw_iiif_metadata($item, 'iiifitems_item_display_element') == 'Never';
     }
-    
+
     /**
      * Return whether the array contains non-IIIF File records
      * @param array $files
@@ -275,7 +275,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         }
         return false;
     }
-    
+
     /**
      * Return the multimedia type of the files given.
      * @param array $files
