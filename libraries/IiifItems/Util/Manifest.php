@@ -71,7 +71,7 @@ class IiifItems_Util_Manifest extends IiifItems_IiifUtil {
             $json['@id'] = $atId;
             $json['sequences'][0]['@id'] = $seqId;
             $json['sequences'][0]['canvases'] = self::findCanvasesFor($collection);
-            parent::addDublinCoreMetadata($json, $collection);
+            parent::addMetadata($json, $collection);
             // Cache accordingly
             cache_iiifitems_value_for($collection, $json, $cacheEntryName);
             // Done
@@ -103,7 +103,7 @@ class IiifItems_Util_Manifest extends IiifItems_IiifUtil {
             ));
         }
         // Override DC metadata
-        parent::addDublinCoreMetadata($json, $item);
+        parent::addMetadata($json, $item);
         if ($item->collection_id !== null) {
             $json['label'] = metadata(get_record_by_id('Collection', $item->collection_id), array('Dublin Core', 'Title'), array('no_escape' => true));
         }
@@ -126,7 +126,7 @@ class IiifItems_Util_Manifest extends IiifItems_IiifUtil {
             IiifItems_Util_Canvas::fileCanvasJson($file)
         ));
         // Override DC metadata
-        parent::addDublinCoreMetadata($json, $file);
+        parent::addMetadata($json, $file);
         // Done
         return $json;
     }

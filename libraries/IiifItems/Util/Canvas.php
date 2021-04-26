@@ -29,11 +29,11 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
      * Return the IIIF Presentation API canvas representation of an ordinary item
      * @param Item $item Non-annotation-typed item
      * @param string $canvasId (optional) Replacement canvas URI
-     * @param boolean $applyDublin (optional) Whether to apply Dublin Core metadata
+     * @param boolean $applyMetadata (optional) Whether to apply all associated metadata
      * @param array $images (optional) An array of IIIF Presentation API images
      * @return array
      */
-    public static function buildCanvas($item, $canvasId=null, $applyDublin=true) {
+    public static function buildCanvas($item, $canvasId=null, $applyMetadata=true) {
         // Fetch the canvas for the given item from IIIF metadata
         try {
             $iiifJsonData = parent::fetchJsonData($item);
@@ -58,8 +58,8 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         if (self::_containsNonIiifFile($itemFiles)) {
             $representativeType = self::_getNonIiifType($itemFiles);
             $representativeUrlBase = str_replace(
-                array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'), 
-                array('iiifitems_' . $representativeType, 'jpg', 'iiifitems_' . $representativeType . '.jpg'), 
+                array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'),
+                array('iiifitems_' . $representativeType, 'jpg', 'iiifitems_' . $representativeType . '.jpg'),
                 get_option('iiifitems_bridge_prefix')
             );
             $iiifJsonData['images'][] = array(
@@ -109,8 +109,8 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
             }
         }
         // Plug DC metadata
-        if ($applyDublin) {
-            parent::addDublinCoreMetadata($iiifJsonData, $item);
+        if ($applyMetadata) {
+            parent::addMetadata($iiifJsonData, $item);
         }
         // Plug otherContent for annotation lists
         if (is_admin_theme()) {
@@ -128,15 +128,15 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         // Done
         return $iiifJsonData;
     }
-    
+
     /**
      * Return the IIIF Presentation API canvas representation of a single annotation on its attached item
      * @param Item $annotation Annotation-typed item
      * @param string $canvasId (optional) Replacement canvas URI
-     * @param boolean $applyDublin (optional) Whether to apply Dublin Core metadata
+     * @param boolean $applyMetadata (optional) Whether to apply all associated metadata
      * @return array
      */
-    public static function buildAnnotationCanvas($annotation, $canvasId=null, $applyDublin=true) {
+    public static function buildAnnotationCanvas($annotation, $canvasId=null, $applyMetadata=true) {
         $base = self::buildCanvas(IiifItems_Util_Annotation::findAnnotatedItemFor($annotation));
         $base['otherContent'] = array(array(
             '@id' => public_full_url(array(
@@ -148,7 +148,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         ));
         return $base;
     }
-    
+
     /**
      * Return the IIIF Presentation API image representation of a file
      * @param File $file
@@ -205,7 +205,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         );
         return $fileJson;
     }
-    
+
     /**
      * Return the IIIF prefix for the given local File record.
      * @param File $file
@@ -214,8 +214,8 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
     public static function fileIiifPrefix($file) {
         $bridgePrefix = get_option('iiifitems_bridge_prefix');
         $replacedBridgePrefix = str_replace(
-            array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'), 
-            array(basename($file->filename), $file->DERIVATIVE_EXT, $file->filename), 
+            array('{FILENAME}', '{EXTENSION}', '{FULLNAME}'),
+            array(basename($file->filename), $file->DERIVATIVE_EXT, $file->filename),
             $bridgePrefix
         );
         return $replacedBridgePrefix;
@@ -225,10 +225,10 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
      * Return a quick-display IIIF Presentation API canvas representation of a file
      * @param File $file
      * @param string $canvasId (optional) Replacement canvas URI
-     * @param boolean $applyDublin (optional) Whether to apply Dublin Core metadata
+     * @param boolean $applyMetadata (optional) Whether to apply all associated metadata
      * @return array
      */
-    public static function fileCanvasJson($file, $canvasId=null, $applyDublin=false) {
+    public static function fileCanvasJson($file, $canvasId=null, $applyMetadata=false) {
         // Default IDs and display titles
         if (!$canvasId) {
             $canvasId = public_full_url(array(
@@ -242,13 +242,13 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         $fileImageJson = self::fileImageJson($file, $canvasId, true);
         // Create IIIF Presentation 2.0 top-level template
         $json = self::blankTemplate($canvasId, $fileImageJson['resource']['width'], $fileImageJson['resource']['height'], $displayTitle, array($fileImageJson));
-        // Apply Dublin Core metadata
-        if ($applyDublin) {
-            parent::addDublinCoreMetadata($json, $file);
+        // Apply all associated metadata
+        if ($applyMetadata) {
+            parent::addMetadata($json, $file);
         }
         return $json;
     }
-    
+
     /**
      * Return whether this item is not presentable in IIIF
      * @param Item $item
@@ -257,7 +257,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
     public static function isNonIiifItem($item) {
         return ($item->item_type_id != get_option('iiifitems_annotation_item_type') && self::_containsNonIiifFile($item->getFiles())) || raw_iiif_metadata($item, 'iiifitems_item_display_element') == 'Never';
     }
-    
+
     /**
      * Return whether the array contains non-IIIF File records
      * @param array $files
@@ -275,7 +275,7 @@ class IiifItems_Util_Canvas extends IiifItems_IiifUtil {
         }
         return false;
     }
-    
+
     /**
      * Return the multimedia type of the files given.
      * @param array $files
