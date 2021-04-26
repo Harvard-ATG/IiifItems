@@ -85,7 +85,7 @@ class IiifItems_IiifUtil {
             foreach ($elementSet as $elementName => $elementContent) {
                 $jsonData['metadata'][] = array(
                     'label' => $elementName,
-                    'value' => join('<br/>', $elementContent)
+                    'value' => trim(join('<br/>', $elementContent))
                 );
             }
         }
